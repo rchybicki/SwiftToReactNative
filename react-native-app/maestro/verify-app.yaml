@@ -1,0 +1,33 @@
+# Maestro Flow: Verify React Native App matches SwiftUI design
+appId: com.rssreader.reactnative
+---
+# Step 1: Verify Setup Screen
+- launchApp:
+    clearState: true
+- assertVisible: "Select source"
+- assertVisible: "Coding Journal"
+- assertVisible: "Hacker News"
+- assertVisible: "The Verge"
+- assertVisible: "Wired"
+- takeScreenshot: screenshots/01-setup-default
+
+# Step 2: Select a source and verify checkmark appears
+- tapOn:
+    id: "source-row-coding-journal"
+- takeScreenshot: screenshots/02-setup-selected
+
+# Step 3: Tap Next to go to Feed
+- tapOn:
+    id: "next-button"
+- assertVisible: "Coding Journal"
+- takeScreenshot: screenshots/03-feed-screen
+
+# Step 4: Navigate to About screen (tap info button)
+- tapOn:
+    id: "info-button"
+- assertVisible: "About"
+- takeScreenshot: screenshots/04-about-attempt
+
+# Step 5: Go back and tap gear to verify navigation behavior
+- back
+- assertVisible: "Coding Journal"

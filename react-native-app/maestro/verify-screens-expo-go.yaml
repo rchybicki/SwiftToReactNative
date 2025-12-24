@@ -1,0 +1,82 @@
+# Verification flow for React Native RSS Reader (Expo Go fallback)
+# Use this only when you can't run a standalone dev build.
+#
+# Usage:
+#   EXPO_URL=exp://... maestro test -e EXPO_URL="$EXPO_URL" maestro/verify-screens-expo-go.yaml
+#
+appId: host.exp.Exponent
+---
+# Start clean for deterministic screenshots
+- launchApp:
+    clearState: true
+
+# Open the Expo project directly (avoids flaky "Recently opened" UI)
+- openLink: ${EXPO_URL}
+
+# iOS may show an "Open in Expo Go" confirmation
+- tapOn:
+    text: "Open"
+    optional: true
+
+# Wait for app to load - look for Setup screen title
+- extendedWaitUntil:
+    visible: "Select source"
+    timeout: 30000
+
+# Dismiss the Expo dev menu modal if it appears
+- tapOn:
+    text: "Continue"
+    optional: true
+
+# Step 1: Verify Setup Screen
+- assertVisible: "Select source"
+- assertVisible: "Coding Journal"
+- assertVisible: "Hacker News"
+- takeScreenshot: screenshots/01-setup-default
+
+# Step 2: Select a source by tapping on the row (stable testID)
+- tapOn:
+    id: "source-row-coding-journal"
+- takeScreenshot: screenshots/02-setup-selected
+
+# Step 3: Navigate to Feed
+- tapOn:
+    id: "next-button"
+- extendedWaitUntil:
+    visible: "Coding Journal"
+    timeout: 15000
+- takeScreenshot: screenshots/03-feed-screen
+
+# Step 4: Navigate to About
+- tapOn:
+    id: "info-button"
+- extendedWaitUntil:
+    visible: "About"
+    timeout: 5000
+- assertVisible: "RSS Reader"
+- takeScreenshot: screenshots/04-about-screen
+
+# Step 5: Navigate to Libraries
+- tapOn:
+    id: "about-item-libraries"
+- extendedWaitUntil:
+    visible: "react-native-rss-parser"
+    timeout: 5000
+- takeScreenshot: screenshots/05-libraries-screen
+
+# Step 6: Go back to About
+- back
+- assertVisible: "About"
+
+# Step 7: Go back to Feed
+- back
+- assertVisible: "Coding Journal"
+
+# Step 8: Tap gear should go BACK to Setup
+- tapOn:
+    id: "settings-button"
+- extendedWaitUntil:
+    visible: "Select source"
+    timeout: 5000
+- takeScreenshot: screenshots/06-back-to-setup
+

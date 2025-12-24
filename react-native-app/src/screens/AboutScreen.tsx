@@ -3,9 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { useNavigation } from '@react-navigation/native';
@@ -25,69 +25,81 @@ export function AboutScreen() {
   const appVersion = Constants.expoConfig?.version || '1.0.0';
   const buildNumber = Constants.expoConfig?.ios?.buildNumber || '1';
 
+  // Order matches SwiftUI: Used libraries first, then Author's blog
   const items: AboutItem[] = [
-    {
-      id: 'author',
-      title: 'Author Blog',
-      subtitle: 'blog.kulman.sk',
-      action: () => WebBrowser.openBrowserAsync('https://blog.kulman.sk'),
-    },
     {
       id: 'libraries',
       title: 'Used Libraries',
       action: () => navigation.navigate('Libraries'),
     },
+    {
+      id: 'author',
+      title: "Author's Blog",
+      subtitle: 'blog.kulman.sk',
+      action: () => WebBrowser.openBrowserAsync('https://blog.kulman.sk'),
+    },
   ];
 
-  const renderItem = ({ item }: { item: AboutItem }) => (
-    <TouchableOpacity
-      style={styles.row}
-      onPress={item.action}
-      disabled={!item.action}
-    >
-      <View>
-        <Text style={styles.title}>{item.title}</Text>
-        {item.subtitle && <Text style={styles.subtitle}>{item.subtitle}</Text>}
-      </View>
-      {item.action && <Text style={styles.chevron}>›</Text>}
-    </TouchableOpacity>
-  );
-
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          source={require('../../assets/icon.png')}
-          style={styles.icon}
-          resizeMode="contain"
-        />
-        <Text style={styles.appName}>RSS Reader</Text>
-        <Text style={styles.version}>
-          Version {appVersion} ({buildNumber})
-        </Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+      {/* Header card with logo */}
+      <View style={styles.card}>
+        <View style={styles.header}>
+          <Image
+            source={require('../../assets/logo.png')}
+            style={styles.icon}
+            resizeMode="contain"
+          />
+          <Text style={styles.appName}>RSS Reader</Text>
+          <Text style={styles.version}>
+            Version {appVersion} ({buildNumber})
+          </Text>
+        </View>
       </View>
 
-      <FlatList
-        data={items}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        style={styles.list}
-      />
-    </View>
+      {/* Menu items card */}
+      <View style={styles.card}>
+        {items.map((item, index) => (
+          <React.Fragment key={item.id}>
+            {index > 0 && <View style={styles.separator} />}
+            <TouchableOpacity
+              style={styles.row}
+              onPress={item.action}
+              disabled={!item.action}
+              accessibilityLabel={item.title}
+              testID={`about-item-${item.id}`}
+            >
+              <View>
+                <Text style={styles.title}>{item.title}</Text>
+                {item.subtitle && <Text style={styles.subtitle}>{item.subtitle}</Text>}
+              </View>
+              {item.action && <Text style={styles.chevron}>›</Text>}
+            </TouchableOpacity>
+          </React.Fragment>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f2f2f7', // iOS system grouped background
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    gap: 20,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   header: {
     alignItems: 'center',
     padding: 24,
-    backgroundColor: '#fff',
-    marginBottom: 20,
   },
   icon: {
     width: 80,
@@ -103,15 +115,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
-  list: {
-    flex: 1,
-  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#fff',
   },
   title: {
     fontSize: 16,
@@ -123,10 +131,11 @@ const styles = StyleSheet.create({
   },
   chevron: {
     fontSize: 24,
-    color: '#ccc',
+    color: '#c7c7cc',
   },
   separator: {
     height: 1,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#c6c6c8',
+    marginLeft: 16,
   },
 });

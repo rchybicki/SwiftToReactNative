@@ -46,31 +46,36 @@ export function FeedScreen() {
     }
   }, [error, clearError]);
 
-  // Set header buttons
+  // Set header buttons - gear on left (matches SwiftUI), info on right
   useEffect(() => {
     navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={handleSettings}
+          style={styles.headerButton}
+          accessibilityLabel="Settings"
+          testID="settings-button"
+        >
+          <Text style={styles.headerButtonText}>⚙</Text>
+        </TouchableOpacity>
+      ),
       headerRight: () => (
-        <View style={styles.headerButtons}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('About')}
-            style={styles.headerButton}
-          >
-            <Text style={styles.headerButtonText}>i</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleSettings}
-            style={styles.headerButton}
-          >
-            <Text style={styles.headerButtonText}>⚙</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('About')}
+          style={styles.headerButton}
+          accessibilityLabel="About"
+          testID="info-button"
+        >
+          <Text style={styles.headerButtonText}>ℹ️</Text>
+        </TouchableOpacity>
       ),
     });
   }, [navigation]);
 
   const handleSettings = async () => {
     await setSelectedSource(null);
-    navigation.navigate('Setup');
+    // Pop back to Setup (like SwiftUI), don't push a new screen
+    navigation.goBack();
   };
 
   const handleItemPress = (item: RssItem) => {
@@ -103,17 +108,15 @@ export function FeedScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f2f2f7', // iOS system grouped background
   },
   separator: {
     height: 1,
-    backgroundColor: '#e0e0e0',
-  },
-  headerButtons: {
-    flexDirection: 'row',
+    backgroundColor: '#c6c6c8',
+    marginLeft: 16,
   },
   headerButton: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
   },
   headerButtonText: {
     fontSize: 20,

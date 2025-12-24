@@ -1,16 +1,29 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { RssSource } from '../models/types';
 
 interface SourceRowProps {
   source: RssSource;
   isSelected: boolean;
   onPress: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
-export function SourceRow({ source, isSelected, onPress }: SourceRowProps) {
+export function SourceRow({ source, isSelected, onPress, isFirst, isLast }: SourceRowProps) {
+  const containerStyle: ViewStyle[] = [styles.container];
+  if (isFirst) containerStyle.push(styles.firstItem);
+  if (isLast) containerStyle.push(styles.lastItem);
+
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity
+      style={containerStyle}
+      onPress={onPress}
+      accessible={true}
+      accessibilityLabel={source.title}
+      accessibilityState={{ selected: isSelected }}
+      testID={`source-row-${source.title.toLowerCase().replace(/\s+/g, '-')}`}
+    >
       <View style={styles.iconContainer}>
         {source.icon ? (
           <Image source={{ uri: source.icon }} style={styles.icon} />
@@ -31,6 +44,14 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: '#fff',
   },
+  firstItem: {
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  lastItem: {
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
   iconContainer: {
     marginRight: 12,
   },
@@ -48,6 +69,6 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     fontSize: 18,
-    color: '#007AFF',
+    color: '#000', // Black like SwiftUI SF Symbol default
   },
 });

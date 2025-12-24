@@ -1,13 +1,14 @@
 import { RssSource } from '../models/types';
 
-const mockParseURL = jest.fn();
+const mockParse = jest.fn();
 
-// Mock rss-parser before importing feed service
-jest.mock('rss-parser', () => {
-  return jest.fn().mockImplementation(() => ({
-    parseURL: mockParseURL,
-  }));
-});
+// Mock react-native-rss-parser
+jest.mock('react-native-rss-parser', () => ({
+  parse: mockParse,
+}));
+
+// Mock global fetch
+global.fetch = jest.fn();
 
 const mockSource: RssSource = {
   title: 'Test Feed',
@@ -21,28 +22,31 @@ describe('Feed Service', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset module to get fresh parser instance
+    // Reset module to get fresh imports
     jest.resetModules();
     // Re-mock after reset
-    jest.mock('rss-parser', () => {
-      return jest.fn().mockImplementation(() => ({
-        parseURL: mockParseURL,
-      }));
-    });
+    jest.mock('react-native-rss-parser', () => ({
+      parse: mockParse,
+    }));
     // Re-import after reset
     const feedModule = require('../services/feed');
     fetchFeed = feedModule.fetchFeed;
     FeedError = feedModule.FeedError;
+
+    // Default fetch mock - returns text
+    (global.fetch as jest.Mock).mockResolvedValue({
+      text: () => Promise.resolve('<rss></rss>'),
+    });
   });
 
   test('fetches and parses RSS feed items', async () => {
-    mockParseURL.mockResolvedValue({
+    mockParse.mockResolvedValue({
       items: [
         {
           title: 'Test Article',
-          link: 'https://example.com/article',
-          contentSnippet: 'This is a test article',
-          pubDate: '2024-01-01T00:00:00Z',
+          links: [{ url: 'https://example.com/article' }],
+          description: 'This is a test article',
+          published: '2024-01-01T00:00:00Z',
         },
       ],
     });
@@ -55,24 +59,24 @@ describe('Feed Service', () => {
   });
 
   test('throws FeedError when feed is empty', async () => {
-    mockParseURL.mockResolvedValue({ items: [] });
+    mockParse.mockResolvedValue({ items: [] });
 
     await expect(fetchFeed(mockSource)).rejects.toThrow(FeedError);
   });
 
   test('handles network errors', async () => {
-    mockParseURL.mockRejectedValue(new Error('Network error'));
+    (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
     await expect(fetchFeed(mockSource)).rejects.toThrow();
   });
 
   test('strips HTML tags from description', async () => {
-    mockParseURL.mockResolvedValue({
+    mockParse.mockResolvedValue({
       items: [
         {
           title: 'Test',
-          link: 'https://example.com',
-          contentSnippet: '<p>HTML <strong>content</strong></p>',
+          links: [{ url: 'https://example.com' }],
+          description: '<p>HTML <strong>content</strong></p>',
         },
       ],
     });

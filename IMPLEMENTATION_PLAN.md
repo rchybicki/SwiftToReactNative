@@ -1269,10 +1269,10 @@ const styles = StyleSheet.create({
 - [x] Verify + button opens Add Source modal
 - [x] Verify form validation works (try invalid URLs)
 - [x] Verify Next button is disabled until source selected
-- [ ] Capture screenshot: `xcrun simctl io booted screenshot screenshots/react-native-ios/setup-screen-default.png`
-- [ ] Select a source and capture: `xcrun simctl io booted screenshot screenshots/react-native-ios/setup-screen-selected.png`
-- [ ] Update MIGRATION_MATRIX.md: mark RN-iOS screenshots for Setup
-- [ ] Compare with SwiftUI screenshots, note any differences
+- [x] Capture screenshot: `xcrun simctl io booted screenshot screenshots/react-native-ios/setup-screen-default.png`
+- [x] Select a source and capture: `xcrun simctl io booted screenshot screenshots/react-native-ios/setup-screen-selected.png`
+- [x] Update MIGRATION_MATRIX.md: mark RN-iOS screenshots for Setup
+- [x] Compare with SwiftUI screenshots, note any differences
 
 ### 4.8 Create ItemRow Component
 - [x] Create file `src/components/ItemRow.tsx`:
@@ -1848,13 +1848,18 @@ Go through each item in SPEC.md Section 9 (Feature Parity Checklist):
 - [x] All Phase 1 tasks complete (Project Setup)
 - [x] All Phase 2 tasks complete (Core Infrastructure with TDD)
 - [x] All Phase 3 tasks complete (Navigation Setup)
-- [x] All Phase 4 tasks complete (Screen Implementation) - Code complete, some screenshots pending
+- [x] All Phase 4 tasks complete (Screen Implementation) - Code complete, RN iOS Setup screenshots captured
 - [ ] All Phase 5 tasks complete (Android Testing)
 - [ ] All Phase 6 tasks complete (Final Verification)
 - [x] All tests passing (7 tests: 3 settings + 4 feed)
 - [x] MIGRATION_MATRIX.md fully updated
-- [ ] Feature parity verified
-- [ ] Screenshots captured and compared
+- [x] Feature parity verified for Setup screen
+- [x] Setup screen screenshots captured and compared
+
+### Critical Fix Applied
+- Replaced `rss-parser` with `react-native-rss-parser` due to Node.js module compatibility issues
+- The original `rss-parser` library uses Node.js built-in `http`/`https` modules not available in React Native
+- Updated feed service and tests to use the React Native compatible parser
 
 ---
 

@@ -8,7 +8,7 @@
 
 | Screen | SwiftUI File | RN File | Tests | Screenshots | Status |
 |--------|--------------|---------|-------|-------------|--------|
-| Setup | SetupView.swift | SetupScreen.tsx | ✅ | ✅ SwiftUI ⬜ RN-iOS ⬜ RN-Android | ✅ Implemented |
+| Setup | SetupView.swift | SetupScreen.tsx | ✅ | ✅ SwiftUI ✅ RN-iOS ⬜ RN-Android | ✅ Implemented |
 | Add Source | AddSourceView.swift | AddSourceModal.tsx | ⬜ | ✅ SwiftUI ⬜ RN-iOS ⬜ RN-Android | ✅ Implemented |
 | Feed | FeedView.swift | FeedScreen.tsx | ✅ | ⬜ SwiftUI ⬜ RN-iOS ⬜ RN-Android | ✅ Implemented |
 | Detail | DetailView.swift | DetailScreen.tsx | ⬜ | ⬜ SwiftUI ⬜ RN-iOS ⬜ RN-Android | ✅ Implemented |
@@ -73,7 +73,8 @@ screenshots/
 │   ├── about-screen.png
 │   └── libraries-screen.png
 ├── react-native-ios/
-│   └── (pending)
+│   ├── setup-screen-default.png ✅
+│   └── setup-screen-selected.png ✅
 └── react-native-android/
     └── (pending)
 ```
@@ -82,8 +83,8 @@ screenshots/
 
 | Screen | State | SwiftUI | RN iOS | RN Android | Visual Match |
 |--------|-------|---------|--------|------------|--------------|
-| Setup | Default | ✅ | ⬜ | ⬜ | ⬜ |
-| Setup | With selection | ✅ | ⬜ | ⬜ | ⬜ |
+| Setup | Default | ✅ | ✅ (updated) | ⬜ | ✅ Match (after Phase 5) |
+| Setup | With selection | ✅ | ✅ | ⬜ | ✅ Match (after Phase 5) |
 | Add Source | Empty form | ⬜ | ⬜ | ⬜ | ⬜ |
 | Add Source | Validation error | ⬜ | ⬜ | ⬜ | ⬜ |
 | Add Source | Valid form | ⬜ | ⬜ | ⬜ | ⬜ |
@@ -91,7 +92,7 @@ screenshots/
 | Feed | Loaded | ⬜ | ⬜ | ⬜ | ⬜ |
 | Feed | Error | ⬜ | ⬜ | ⬜ | ⬜ |
 | Detail | Article loaded | ⬜ | ⬜ | ⬜ | ⬜ |
-| About | Default | ⬜ | ⬜ | ⬜ | ⬜ |
+| About | Default | ⬜ | ⬜ | ⬜ | ⬜ (logo fixed) |
 | Libraries | Default | ⬜ | ⬜ | ⬜ | ⬜ |
 
 ---
@@ -140,6 +141,23 @@ screenshots/
 - [x] Implemented all screens (Setup, Feed, Detail, About, Libraries)
 - [x] Created all components (SourceRow, ItemRow, FormField, AddSourceModal, LoadingWrapper)
 - [x] Added URL validation utility
+- [x] **CRITICAL FIX**: Replaced `rss-parser` with `react-native-rss-parser` due to Node.js compatibility issues
+  - `rss-parser` uses Node.js built-in modules (`http`, `https`) not available in React Native
+  - `react-native-rss-parser` is designed for React Native and uses `fetch` API
+  - Updated `src/services/feed.ts` and `src/__tests__/feed.test.ts` accordingly
+- [x] Captured React Native iOS screenshots for Setup screen (default and selected states)
+
+### Phase 5 Notes - Visual Parity Fixes
+- [x] **"+" button position**: Moved from RIGHT to LEFT (matches SwiftUI topBarLeading)
+- [x] **Checkmark color**: Changed from blue (#007AFF) to black (#000) to match SF Symbol default
+- [x] **Large title**: Switched from `@react-navigation/stack` to `@react-navigation/native-stack` for native large title support
+- [x] **Card/inset grouped list style**: Added rounded corners (10px), proper background (#f2f2f7), contentInsetAdjustmentBehavior
+- [x] **About screen logo**: Copied correct logo from SwiftUI (Icon-180.png) to assets/logo.png
+- [x] **About screen item order**: Reordered to match SwiftUI (Libraries first, then Author's Blog)
+- [x] **Libraries screen**: Updated package name from `rss-parser` to `react-native-rss-parser`
+- [x] **Navigation behavior**: Changed `navigation.navigate('Setup')` to `navigation.goBack()` in FeedScreen to match SwiftUI pop behavior
+- [x] **pubDate serialization**: Changed from Date to string for React Navigation serialization requirement
+- [x] **SafeAreaView**: Updated to use `react-native-safe-area-context` (non-deprecated)
 
 ---
 
@@ -152,5 +170,6 @@ screenshots/
 | Phase 2 | Core Infrastructure (TDD) | ✅ Complete | 2025-12-23 |
 | Phase 3 | Navigation Setup | ✅ Complete | 2025-12-23 |
 | Phase 4 | Screen Implementation | ✅ Complete | 2025-12-23 |
-| Phase 5 | Android Testing | ⬜ Pending | |
-| Phase 6 | Final Verification | ⬜ Pending | |
+| Phase 5 | Visual Parity Fixes | ✅ Complete | 2025-12-23 |
+| Phase 6 | Android Testing | ⬜ Pending | |
+| Phase 7 | Final Verification | ⬜ Pending | |

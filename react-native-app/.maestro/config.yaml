@@ -1,0 +1,15 @@
+# Maestro configuration for React Native RSS Reader
+# Keep all artifacts in-repo for easy before/after comparisons.
+
+# Where takeScreenshot() and other artifacts are written (relative to react-native-app/)
+testOutputDir: .maestro-output
+
+# Reduce flakiness from iOS/Android animations
+platform:
+  ios:
+    disableAnimations: true
+  android:
+    disableAnimations: true
+
+flows:
+  - 'maestro/*'

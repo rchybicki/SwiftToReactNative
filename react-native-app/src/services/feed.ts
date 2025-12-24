@@ -1,4 +1,4 @@
-import Parser from 'rss-parser';
+import * as rssParser from 'react-native-rss-parser';
 import { RssSource, RssItem } from '../models/types';
 
 export class FeedError extends Error {
@@ -6,16 +6,6 @@ export class FeedError extends Error {
     super(message);
     this.name = 'FeedError';
   }
-}
-
-// Lazy initialization to allow for mocking
-let parser: Parser | null = null;
-
-function getParser(): Parser {
-  if (!parser) {
-    parser = new Parser();
-  }
-  return parser;
 }
 
 // Strip HTML tags from text
@@ -26,7 +16,9 @@ function stripHtml(html: string | undefined): string | undefined {
 
 export async function fetchFeed(source: RssSource): Promise<RssItem[]> {
   try {
-    const feed = await getParser().parseURL(source.rss);
+    const response = await fetch(source.rss);
+    const responseText = await response.text();
+    const feed = await rssParser.parse(responseText);
 
     if (!feed.items || feed.items.length === 0) {
       throw new FeedError('Feed is empty');
@@ -34,9 +26,9 @@ export async function fetchFeed(source: RssSource): Promise<RssItem[]> {
 
     return feed.items.map((item) => ({
       title: item.title || 'Untitled',
-      description: stripHtml(item.contentSnippet || item.content),
-      link: item.link || '',
-      pubDate: item.pubDate ? new Date(item.pubDate) : undefined,
+      description: stripHtml(item.description),
+      link: item.links?.[0]?.url || item.id || '',
+      pubDate: item.published || undefined, // Keep as ISO string for serialization
     }));
   } catch (error) {
     if (error instanceof FeedError) {

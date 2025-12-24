@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcrun simctl:*)",
+      "Bash(xcodebuild:*)",
+      "Bash(open:*)",
+      "Bash(cat:*)",
+      "WebSearch",
+      "Bash(npx create-expo-app@latest . --template expo-template-blank-typescript --yes)",
+      "Bash(npx expo install:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm test:*)",
+      "Bash(lsof:*)",
+      "mcp__chrome-devtools__press_key",
+      "Bash(tree:*)",
+      "Bash(npx expo start:*)",
+      "mcp__chrome-devtools__list_pages",
+      "Bash(brew search:*)",
+      "Bash(maestro test:*)",
+      "WebFetch(domain:docs.maestro.dev)",
+      "WebFetch(domain:maestro.dev)",
+      "Bash(npx eas-cli:*)",
+      "Bash(eas build:*)",
+      "Bash(npx expo prebuild:*)"
+    ]
+  }
+}

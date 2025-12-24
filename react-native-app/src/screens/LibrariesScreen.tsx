@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
 interface Library {
   id: string;
@@ -9,44 +9,50 @@ interface Library {
 
 const libraries: Library[] = [
   { id: '1', name: '@react-navigation/native', license: 'MIT' },
-  { id: '2', name: '@react-navigation/stack', license: 'MIT' },
+  { id: '2', name: '@react-navigation/native-stack', license: 'MIT' },
   { id: '3', name: 'react-native-webview', license: 'MIT' },
-  { id: '4', name: 'rss-parser', license: 'MIT' },
+  { id: '4', name: 'react-native-rss-parser', license: 'MIT' },
   { id: '5', name: '@react-native-async-storage/async-storage', license: 'MIT' },
   { id: '6', name: 'expo-web-browser', license: 'MIT' },
 ];
 
 export function LibrariesScreen() {
-  const renderItem = ({ item }: { item: Library }) => (
-    <View style={styles.row}>
-      <Text style={styles.name}>{item.name}</Text>
-      <Text style={styles.license}>{item.license}</Text>
-    </View>
-  );
-
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={libraries}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
-    </View>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+      <View style={styles.card}>
+        {libraries.map((item, index) => (
+          <React.Fragment key={item.id}>
+            {index > 0 && <View style={styles.separator} />}
+            <View style={styles.row}>
+              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.license}>{item.license}</Text>
+            </View>
+          </React.Fragment>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f2f2f7', // iOS system grouped background
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#fff',
   },
   name: {
     fontSize: 16,
@@ -58,6 +64,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#c6c6c8',
+    marginLeft: 16,
   },
 });

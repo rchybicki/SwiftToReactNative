@@ -11,7 +11,7 @@ export interface RssItem {
   title: string;
   description?: string;
   link: string;
-  pubDate?: Date;
+  pubDate?: string; // ISO string for serialization (React Navigation requires serializable params)
 }
 
 // Screen State - matches SwiftUI ScreenState<T>

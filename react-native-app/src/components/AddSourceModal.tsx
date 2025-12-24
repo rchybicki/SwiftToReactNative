@@ -5,9 +5,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { FormField } from './FormField';
 import { RssSource } from '../models/types';
 import { isValidURL } from '../utils/validation';

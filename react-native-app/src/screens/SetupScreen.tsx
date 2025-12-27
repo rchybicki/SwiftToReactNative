@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   FlatList,
@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   Text,
   Alert,
-  ScrollView,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SetupScreenNavigationProp } from '../navigation/types';
 import { RssSource } from '../models/types';
@@ -27,40 +27,11 @@ export function SetupScreen() {
     setSources(sourcesData as RssSource[]);
   }, []);
 
-  useEffect(() => {
-    // Set header buttons - "+" on left (matches SwiftUI), "Next" on right
-    navigation.setOptions({
-      headerLeft: () => (
-        <TouchableOpacity
-          onPress={() => setShowAddModal(true)}
-          style={styles.headerButton}
-          accessibilityLabel="Add source"
-          testID="add-source-button"
-        >
-          <Text style={styles.addButtonText}>+</Text>
-        </TouchableOpacity>
-      ),
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={handleNext}
-          style={styles.headerButton}
-          disabled={!selected}
-          accessibilityLabel="Next"
-          testID="next-button"
-        >
-          <Text style={[styles.headerButtonText, !selected && styles.headerButtonDisabled]}>
-            Next
-          </Text>
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation, selected]);
-
   const handleSelect = (source: RssSource) => {
     setSelected(source);
   };
 
-  const handleNext = async () => {
+  const handleNext = useCallback(async () => {
     if (!selected) {
       Alert.alert('Error', 'Please select a source');
       return;
@@ -68,11 +39,41 @@ export function SetupScreen() {
 
     await setSelectedSource(selected);
     navigation.navigate('Feed', { source: selected });
-  };
+  }, [selected, setSelectedSource, navigation]);
 
   const handleAddSource = (source: RssSource) => {
-    setSources([...sources, source]);
+    setSources((prev) => [...prev, source]);
+    setShowAddModal(false);
   };
+
+  useEffect(() => {
+    // Set header buttons - "+" on left (matches SwiftUI), "Next" on right
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => setShowAddModal(true)}
+          style={styles.headerIconButton}
+          accessibilityLabel="Add source"
+          testID="add-source-button"
+        >
+          <Ionicons name="add" size={22} color="#000000" />
+        </TouchableOpacity>
+      ),
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={handleNext}
+          style={[styles.headerPill, !selected && styles.headerPillDisabled]}
+          disabled={!selected}
+          accessibilityLabel="Next"
+          testID="next-button"
+        >
+          <Text style={[styles.headerPillText, !selected && styles.headerPillTextDisabled]}>
+            Next
+          </Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, selected, handleNext]);
 
   const renderItem = ({ item, index }: { item: RssSource; index: number }) => (
     <SourceRow
@@ -93,6 +94,7 @@ export function SetupScreen() {
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={styles.listContent}
         style={styles.container}
+        testID="setup-screen"
         contentInsetAdjustmentBehavior="automatic"
         ListHeaderComponent={<View style={styles.listTop} />}
         ListFooterComponent={<View style={styles.listBottom} />}
@@ -128,19 +130,31 @@ const styles = StyleSheet.create({
     backgroundColor: '#c6c6c8',
     marginLeft: 60, // Inset separator like iOS
   },
-  headerButton: {
-    paddingHorizontal: 12,
+  headerIconButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 4,
   },
-  headerButtonText: {
-    fontSize: 17,
+  headerPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
+    marginRight: 4,
+  },
+  headerPillDisabled: {
+    backgroundColor: '#e5e5ea',
+  },
+  headerPillText: {
+    fontSize: 15,
     color: '#007AFF',
+    fontWeight: '600',
   },
-  addButtonText: {
-    fontSize: 28,
-    fontWeight: '300',
-    color: '#000', // Black like SwiftUI
-  },
-  headerButtonDisabled: {
-    color: '#ccc',
+  headerPillTextDisabled: {
+    color: '#8e8e93',
   },
 });

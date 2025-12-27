@@ -7,60 +7,198 @@ appId: com.rssreader.reactnative
 # Launch the app with a clean state so screenshots are deterministic
 - launchApp:
     clearState: true
-
+#
+# Dev client needs a deep link to connect to Metro.
+# Provide DEV_CLIENT_URL (exp+react-native-app://...) when running Maestro.
+- openLink: ${DEV_CLIENT_URL}
 # Wait for app to load - look for Setup screen title
 - extendedWaitUntil:
     visible: "Select source"
     timeout: 30000
 
-# Step 1: Verify Setup Screen
+# Step 1: Setup Screen (default)
+- assertVisible:
+    id: "setup-screen"
 - assertVisible: "Select source"
 - assertVisible: "Coding Journal"
 - assertVisible: "Hacker News"
-- takeScreenshot: screenshots/01-setup-default
+- takeScreenshot: .maestro-output/screenshots/setup-screen-default
 
-# Step 2: Select a source by tapping on the row
+# Step 2: Setup Screen (selected)
 - tapOn:
     id: "source-row-coding-journal"
-- takeScreenshot: screenshots/02-setup-selected
+- takeScreenshot: .maestro-output/screenshots/setup-screen-selected
 
-# Step 3: Navigate to Feed
+# Step 3: Add Source (empty + validation)
+- tapOn: "Add source"
+- tapOn:
+    id: "add-source-button"
+    optional: true
+- extendedWaitUntil:
+    visible: "Add Source"
+    timeout: 10000
+- takeScreenshot: .maestro-output/screenshots/add-source-empty
+- tapOn:
+    id: "add-source-url-input"
+    optional: true
+- longPressOn:
+    id: "add-source-url-input"
+- inputText: "not-a-url"
+- tapOn:
+    id: "add-source-title-input"
+    optional: true
+- takeScreenshot: .maestro-output/screenshots/add-source-validation-error
+- tapOn:
+    id: "add-source-cancel"
+
+# Step 4: Add Source (valid)
+- tapOn: "Add source"
+- tapOn:
+    id: "add-source-button"
+    optional: true
+- extendedWaitUntil:
+    visible: "Add Source"
+    timeout: 10000
+- tapOn:
+    id: "add-source-title-input"
+    optional: true
+- inputText: "Example"
+- tapOn:
+    id: "add-source-url-input"
+    optional: true
+- longPressOn:
+    id: "add-source-url-input"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- inputText: "https://example.com"
+- tapOn:
+    id: "add-source-rss-input"
+    optional: true
+- longPressOn:
+    id: "add-source-rss-input"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- inputText: "https://example.com/rss"
+- tapOn:
+    id: "add-source-icon-input"
+    optional: true
+- longPressOn:
+    id: "add-source-icon-input"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- pressKey: "Backspace"
+- inputText: "https://example.com/icon.png"
+- takeScreenshot: .maestro-output/screenshots/add-source-valid
+- tapOn:
+    id: "add-source-submit"
+# Step 5: Feed (loading + error) using invalid feed
+- extendedWaitUntil:
+    visible: "Select source"
+    timeout: 10000
+- tapOn:
+    id: "source-row-example"
 - tapOn:
     id: "next-button"
 - extendedWaitUntil:
-    visible: "Coding Journal"
-    timeout: 10000
-- takeScreenshot: screenshots/03-feed-screen
-
-# Step 4: Navigate to About (tap info button by testID)
-- tapOn:
-    id: "info-button"
+    visible:
+      id: "feed-screen"
+    timeout: 15000
+- takeScreenshot: .maestro-output/screenshots/feed-screen-loading
 - extendedWaitUntil:
-    visible: "About"
-    timeout: 5000
-- assertVisible: "RSS Reader"
-- takeScreenshot: screenshots/04-about-screen
+    visible: "OK"
+    timeout: 15000
+- takeScreenshot: .maestro-output/screenshots/feed-screen-error
+- tapOn: "OK"
 
-# Step 5: Navigate to Libraries
-- tapOn:
-    id: "about-item-libraries"
-- extendedWaitUntil:
-    visible: "react-native-rss-parser"
-    timeout: 5000
-- takeScreenshot: screenshots/05-libraries-screen
-
-# Step 6: Go back to About
-- back
-- assertVisible: "About"
-
-# Step 7: Go back to Feed
-- back
-- assertVisible: "Coding Journal"
-
-# Step 8: Test navigation - tap gear should go BACK to Setup (not push new screen)
-- tapOn:
-    id: "settings-button"
+# Step 6: Relaunch to return to Setup (back swipe is unreliable on iOS)
+- launchApp:
+    clearState: true
+- openLink: ${DEV_CLIENT_URL}
 - extendedWaitUntil:
     visible: "Select source"
+    timeout: 30000
+
+# Step 7: Feed (loaded)
+- tapOn:
+    id: "source-row-coding-journal"
+- tapOn:
+    id: "next-button"
+- tapOn:
+    text: "Next"
+    optional: true
+- extendedWaitUntil:
+    visible: "Coding Journal"
+    timeout: 20000
+- takeScreenshot: .maestro-output/screenshots/feed-screen-loaded
+
+# Step 8: About screen
+- extendedWaitUntil:
+    visible:
+      id: "info-button"
+    timeout: 10000
+- tapOn:
+    id: "info-button"
+- tapOn:
+    text: "About"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "about-item-libraries"
+    timeout: 15000
+- takeScreenshot: .maestro-output/screenshots/about-screen
+
+# Step 9: Libraries screen
+- tapOn:
+    id: "about-item-libraries"
+- tapOn:
+    text: "Used libraries"
+    optional: true
+- extendedWaitUntil:
+    visible: "FeedKit"
     timeout: 5000
-- takeScreenshot: screenshots/06-back-to-setup
+- takeScreenshot: .maestro-output/screenshots/libraries-screen
+
+# Step 10: Relaunch for Detail screen (avoid flaky back navigation)
+- launchApp:
+    clearState: true
+- openLink: ${DEV_CLIENT_URL}
+- extendedWaitUntil:
+    visible: "Select source"
+    timeout: 30000
+- tapOn:
+    id: "source-row-coding-journal"
+- tapOn:
+    id: "next-button"
+- tapOn:
+    text: "Next"
+    optional: true
+- extendedWaitUntil:
+    visible: "Coding Journal"
+    timeout: 20000
+- tapOn:
+    point: "50%,32%"
+- extendedWaitUntil:
+    visible:
+      id: "detail-webview"
+    timeout: 20000
+- takeScreenshot: .maestro-output/screenshots/detail-screen

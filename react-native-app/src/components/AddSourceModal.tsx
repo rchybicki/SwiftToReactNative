@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FormField } from './FormField';
@@ -42,6 +43,7 @@ export function AddSourceModal({ visible, onClose, onAdd }: AddSourceModalProps)
       icon: iconUrl.trim() || undefined,
     };
 
+    Keyboard.dismiss();
     onAdd(source);
     resetForm();
     onClose();
@@ -62,50 +64,67 @@ export function AddSourceModal({ visible, onClose, onAdd }: AddSourceModalProps)
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleClose}>
-            <Text style={styles.cancelButton}>Cancel</Text>
+        <View style={styles.headerRow}>
+          <TouchableOpacity
+            onPress={handleClose}
+            style={styles.closeButton}
+            accessibilityLabel="Cancel"
+            testID="add-source-cancel"
+          >
+            <Text style={styles.closeButtonText}>×</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Add Source</Text>
-          <TouchableOpacity onPress={handleAdd} disabled={!isFormValid()}>
-            <Text style={[styles.addButton, !isFormValid() && styles.addButtonDisabled]}>
+          <TouchableOpacity
+            onPress={handleAdd}
+            disabled={!isFormValid()}
+            style={[styles.addButton, !isFormValid() && styles.addButtonDisabled]}
+            accessibilityLabel="Add"
+            testID="add-source-submit"
+          >
+            <Text style={[styles.addButtonText, !isFormValid() && styles.addButtonTextDisabled]}>
               Add
             </Text>
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.form}>
+        <Text style={styles.title}>Add source</Text>
+
+        <ScrollView
+          style={styles.form}
+          contentContainerStyle={styles.formContent}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
+        >
           <FormField
             label="Title"
             value={title}
             onChangeText={setTitle}
             type="string"
             required={true}
-            placeholder="Feed name"
+            testID="add-source-title-input"
           />
           <FormField
-            label="Website URL"
+            label="URL"
             value={url}
             onChangeText={setUrl}
             type="url"
             required={true}
-            placeholder="https://example.com"
+            testID="add-source-url-input"
           />
           <FormField
-            label="RSS Feed URL"
+            label="RSS URL"
             value={rssUrl}
             onChangeText={setRssUrl}
             type="url"
             required={true}
-            placeholder="https://example.com/feed.xml"
+            testID="add-source-rss-input"
           />
           <FormField
-            label="Icon URL (optional)"
+            label="Image URL (optional)"
             value={iconUrl}
             onChangeText={setIconUrl}
             type="url"
             required={false}
-            placeholder="https://example.com/icon.png"
+            testID="add-source-icon-input"
           />
         </ScrollView>
       </SafeAreaView>
@@ -116,34 +135,58 @@ export function AddSourceModal({ visible, onClose, onAdd }: AddSourceModalProps)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f2f2f7',
   },
-  header: {
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  closeButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  headerTitle: {
-    fontSize: 17,
+  closeButtonText: {
+    fontSize: 18,
     fontWeight: '600',
+    color: '#000',
   },
-  cancelButton: {
-    fontSize: 17,
-    color: '#007AFF',
+  title: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#000',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
   addButton: {
-    fontSize: 17,
-    color: '#007AFF',
-    fontWeight: '600',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: '#ffffff',
   },
   addButtonDisabled: {
-    color: '#ccc',
+    backgroundColor: '#e5e5ea',
+  },
+  addButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#007AFF',
+  },
+  addButtonTextDisabled: {
+    color: '#8e8e93',
   },
   form: {
-    padding: 16,
+    flex: 1,
+  },
+  formContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
   },
 });

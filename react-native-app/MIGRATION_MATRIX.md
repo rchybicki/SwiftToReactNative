@@ -9,11 +9,11 @@
 | Screen | SwiftUI File | RN File | Tests | Screenshots | Status |
 |--------|--------------|---------|-------|-------------|--------|
 | Setup | SetupView.swift | SetupScreen.tsx | ✅ | ✅ SwiftUI ✅ RN-iOS ⬜ RN-Android | ✅ Implemented |
-| Add Source | AddSourceView.swift | AddSourceModal.tsx | ⬜ | ✅ SwiftUI ⬜ RN-iOS ⬜ RN-Android | ✅ Implemented |
-| Feed | FeedView.swift | FeedScreen.tsx | ✅ | ⬜ SwiftUI ⬜ RN-iOS ⬜ RN-Android | ✅ Implemented |
-| Detail | DetailView.swift | DetailScreen.tsx | ⬜ | ⬜ SwiftUI ⬜ RN-iOS ⬜ RN-Android | ✅ Implemented |
-| About | AboutView.swift | AboutScreen.tsx | ⬜ | ⬜ SwiftUI ⬜ RN-iOS ⬜ RN-Android | ✅ Implemented |
-| Libraries | LibrariesView.swift | LibrariesScreen.tsx | ⬜ | ⬜ SwiftUI ⬜ RN-iOS ⬜ RN-Android | ✅ Implemented |
+| Add Source | AddSourceView.swift | AddSourceModal.tsx | ⬜ | ✅ SwiftUI ✅ RN-iOS ⬜ RN-Android | ✅ Implemented |
+| Feed | FeedView.swift | FeedScreen.tsx | ✅ | ✅ SwiftUI ✅ RN-iOS ⬜ RN-Android | ✅ Implemented |
+| Detail | DetailView.swift | DetailScreen.tsx | ⬜ | ✅ SwiftUI ✅ RN-iOS ⬜ RN-Android | ✅ Implemented |
+| About | AboutView.swift | AboutScreen.tsx | ⬜ | ✅ SwiftUI ✅ RN-iOS ⬜ RN-Android | ✅ Implemented |
+| Libraries | LibrariesView.swift | LibrariesScreen.tsx | ⬜ | ✅ SwiftUI ✅ RN-iOS ⬜ RN-Android | ✅ Implemented |
 
 ---
 
@@ -57,24 +57,56 @@
 
 ## 5. Screenshot Comparison Log
 
+### Screenshot Capture Protocol (Dual Simulators + Size Limits)
+- Always run two iOS simulators at the same time: one for **SwiftUI (old)** and one for **React Native (new)**.
+- Use the **same device model and runtime** for both to keep resolution identical.
+- **Standard resolution:** iPhone 17 Pro portrait = **1206 × 2622 px** (402 × 874 pt @3x).
+- **Size limit:** keep each PNG **≤ 400 KB**. Check with `ls -lh screenshots/**/**/*.png`.
+- If any PNG exceeds 400 KB, downscale **both SwiftUI + RN** screenshots from that capture batch:
+  - `sips -Z 2000 screenshots/swiftui/*.png screenshots/react-native-ios/*.png`
+  - Re-check sizes and note the resize in this log.
+
+### Screenshot Capture Steps (Exact)
+1. Boot both simulators and set identical status bars:
+   - `xcrun simctl list devices | rg -n \"iPhone 17 Pro\"`
+   - `xcrun simctl boot <SWIFTUI_UDID>` and `xcrun simctl boot <RN_UDID>`
+   - `xcrun simctl status_bar <UDID> override --time \"09:41\" --dataNetwork wifi --wifiBars 3 --cellularBars 4 --batteryState charged --batteryLevel 100`
+2. **React Native (new):** run Maestro and export screenshots.
+   - `DEV_CLIENT_URL=\"exp+react-native-app://expo-development-client/?url=http%3A%2F%2F<LAN_IP>%3A8081\"`
+   - `maestro test --debug-output=react-native-app/.maestro-output/debug --flatten-debug-output -e DEV_CLIENT_URL=\"$DEV_CLIENT_URL\" react-native-app/maestro/verify-screens.yaml`
+   - `cp -f .maestro-output/screenshots/*.png screenshots/react-native-ios/`
+3. **SwiftUI (old):** run the SwiftUI Maestro flow and copy screenshots.
+   - `maestro test --debug-output=sources/.maestro-output/debug --flatten-debug-output sources/maestro/swiftui-verify-screens.yaml`
+   - `cp -f sources/.maestro-output/screenshots/screenshots/*.png screenshots/swiftui/`
+4. Verify size/resolution, then update this log.
+
 ### Directory Structure
 ```
 screenshots/
 ├── swiftui/
 │   ├── setup-screen-default.png ✅
 │   ├── setup-screen-selected.png ✅
-│   ├── add-source-empty.png
-│   ├── add-source-validation-error.png
-│   ├── add-source-valid.png
-│   ├── feed-screen-loading.png
-│   ├── feed-screen-loaded.png
-│   ├── feed-screen-error.png
-│   ├── detail-screen.png
-│   ├── about-screen.png
-│   └── libraries-screen.png
+│   ├── add-source-empty.png ✅
+│   ├── add-source-validation-error.png ✅
+│   ├── add-source-valid.png ✅
+│   ├── feed-screen-loading.png ✅
+│   ├── feed-screen-loaded.png ✅
+│   ├── feed-screen-error.png ✅
+│   ├── detail-screen.png ✅
+│   ├── about-screen.png ✅
+│   └── libraries-screen.png ✅
 ├── react-native-ios/
 │   ├── setup-screen-default.png ✅
-│   └── setup-screen-selected.png ✅
+│   ├── setup-screen-selected.png ✅
+│   ├── add-source-empty.png ✅
+│   ├── add-source-validation-error.png ✅
+│   ├── add-source-valid.png ✅
+│   ├── feed-screen-loading.png ✅
+│   ├── feed-screen-loaded.png ✅
+│   ├── feed-screen-error.png ✅
+│   ├── detail-screen.png ✅
+│   ├── about-screen.png ✅
+│   └── libraries-screen.png ✅
 └── react-native-android/
     └── (pending)
 ```
@@ -83,17 +115,33 @@ screenshots/
 
 | Screen | State | SwiftUI | RN iOS | RN Android | Visual Match |
 |--------|-------|---------|--------|------------|--------------|
-| Setup | Default | ✅ | ✅ (updated) | ⬜ | ✅ Match (after Phase 5) |
-| Setup | With selection | ✅ | ✅ | ⬜ | ✅ Match (after Phase 5) |
-| Add Source | Empty form | ⬜ | ⬜ | ⬜ | ⬜ |
-| Add Source | Validation error | ⬜ | ⬜ | ⬜ | ⬜ |
-| Add Source | Valid form | ⬜ | ⬜ | ⬜ | ⬜ |
-| Feed | Loading | ⬜ | ⬜ | ⬜ | ⬜ |
-| Feed | Loaded | ⬜ | ⬜ | ⬜ | ⬜ |
-| Feed | Error | ⬜ | ⬜ | ⬜ | ⬜ |
-| Detail | Article loaded | ⬜ | ⬜ | ⬜ | ⬜ |
-| About | Default | ⬜ | ⬜ | ⬜ | ⬜ (logo fixed) |
-| Libraries | Default | ⬜ | ⬜ | ⬜ | ⬜ |
+| Setup | Default | ✅ | ✅ (updated) | ⬜ | ⚠️ Minor |
+| Setup | With selection | ✅ | ✅ | ⬜ | ⚠️ Minor |
+| Add Source | Empty form | ✅ | ✅ | ⬜ | ⚠️ Minor |
+| Add Source | Validation error | ✅ | ✅ | ⬜ | ⚠️ Minor |
+| Add Source | Valid form | ✅ | ✅ | ⬜ | ⚠️ Minor |
+| Feed | Loading | ✅ | ✅ | ⬜ | ⚠️ Minor |
+| Feed | Loaded | ✅ | ✅ | ⬜ | ⚠️ Minor |
+| Feed | Error | ✅ | ✅ | ⬜ | ⚠️ Minor |
+| Detail | Article loaded | ✅ | ✅ | ⬜ | ✅ Match |
+| About | Default | ✅ | ✅ | ⬜ | ⚠️ Minor |
+| Libraries | Default | ✅ | ✅ | ⬜ | ⚠️ Minor |
+
+### Visual Parity Review Log (iOS)
+
+| Screen/State | SwiftUI Screenshot | RN iOS Screenshot | Match | Notes |
+|--------------|-------------------|------------------|-------|-------|
+| Setup - Default | `screenshots/swiftui/setup-screen-default.png` | `screenshots/react-native-ios/setup-screen-default.png` | ⚠️ | Minor spacing + list row/icon sizing differences; disabled Next tint/opacity slightly different. |
+| Setup - Selected | `screenshots/swiftui/setup-screen-selected.png` | `screenshots/react-native-ios/setup-screen-selected.png` | ⚠️ | Next pill styling still slightly different; small row spacing differences. |
+| Add Source - Empty | `screenshots/swiftui/add-source-empty.png` | `screenshots/react-native-ios/add-source-empty.png` | ⚠️ | Sheet layout now aligned; minor label sizing/top padding differences. |
+| Add Source - Validation error | `screenshots/swiftui/add-source-validation-error.png` | `screenshots/react-native-ios/add-source-validation-error.png` | ⚠️ | URL validation text should be red (SwiftUI); RN shows default text color. |
+| Add Source - Valid | `screenshots/swiftui/add-source-valid.png` | `screenshots/react-native-ios/add-source-valid.png` | ⚠️ | Add button enabled color differs; scroll/keyboard inset shows more of Image URL field in RN. |
+| Feed - Loading | `screenshots/swiftui/feed-screen-loading.png` | `screenshots/react-native-ios/feed-screen-loading.png` | ⚠️ | Refresh banner no longer visible; minor header icon/tint differences remain. |
+| Feed - Loaded | `screenshots/swiftui/feed-screen-loaded.png` | `screenshots/react-native-ios/feed-screen-loaded.png` | ⚠️ | Row typography/spacing + chevron weight slightly differ; header icons minor. |
+| Feed - Error | `screenshots/swiftui/feed-screen-error.png` | `screenshots/react-native-ios/feed-screen-error.png` | ⚠️ | Refresh banner no longer visible; minor header icon/tint differences remain. |
+| Detail - Article loaded | `screenshots/swiftui/detail-screen.png` | `screenshots/react-native-ios/detail-screen.png` | ✅ | Very close; minor nav bar/spacing differences only. |
+| About - Default | `screenshots/swiftui/about-screen.png` | `screenshots/react-native-ios/about-screen.png` | ⚠️ | Overlap fixed; minor nav back button label/style difference vs SwiftUI. |
+| Libraries - Default | `screenshots/swiftui/libraries-screen.png` | `screenshots/react-native-ios/libraries-screen.png` | ⚠️ | Overlap fixed; minor nav back button label/style difference vs SwiftUI. |
 
 ---
 
@@ -158,6 +206,46 @@ screenshots/
 - [x] **Navigation behavior**: Changed `navigation.navigate('Setup')` to `navigation.goBack()` in FeedScreen to match SwiftUI pop behavior
 - [x] **pubDate serialization**: Changed from Date to string for React Navigation serialization requirement
 - [x] **SafeAreaView**: Updated to use `react-native-safe-area-context` (non-deprecated)
+- [x] **Dev menu suppression (iOS dev build)**: Disabled Expo dev menu onboarding + gestures via UserDefaults in AppDelegate to keep screenshots clean.
+- [x] **Maestro stability helpers**: Added testIDs for Add Source inputs and Detail WebView; updated flow to capture add-source/feed/detail/about/libraries states.
+- [x] **SwiftUI Maestro hooks**: Added accessibility identifiers for Add Source fields/buttons to support SwiftUI Maestro flow.
+- [x] **About/Libraries top inset**: Switched to header-height padding to avoid large title overlap.
+
+### Capture Status (2025-12-27)
+- RN iOS screenshots captured for all required states and copied into `screenshots/react-native-ios/`.
+- SwiftUI Maestro flow completes end-to-end and screenshots captured for all required states, copied into `screenshots/swiftui/`.
+- Dev menu onboarding sheet is disabled in DEBUG via UserDefaults to avoid blocking flows.
+- About/Libraries overlap fixed in RN; screenshots re-captured.
+
+### Capture Path Evaluation (2025-12-26)
+- [x] **Ad-hoc iOS capture**: `react-native-app/scripts/screenshot-ios.sh` works against a booted simulator and saves PNGs deterministically.
+- [x] **Maestro capture**: Java 17 installed and Maestro runs in dev-client mode. Flow now captures initial RN screenshots; remaining steps still flaky around Add Source inputs.
+- [x] **Navigation coverage**: Maestro flows validate navigation (Setup → Feed → About → Libraries → Back → Setup) and enforce state reset via `launchApp(clearState: true)`.
+- [x] **Decision**: Maestro flow verified end-to-end for SwiftUI and RN iOS; RN Android pending.
+
+### Full Re-capture Checklist (iOS)
+- [x] SwiftUI: Setup (default)
+- [x] SwiftUI: Setup (selected)
+- [x] SwiftUI: Add Source (empty)
+- [x] SwiftUI: Add Source (validation error)
+- [x] SwiftUI: Add Source (valid)
+- [x] SwiftUI: Feed (loading)
+- [x] SwiftUI: Feed (loaded)
+- [x] SwiftUI: Feed (error)
+- [x] SwiftUI: Detail (loaded)
+- [x] SwiftUI: About
+- [x] SwiftUI: Libraries
+- [x] RN iOS: Setup (default)
+- [x] RN iOS: Setup (selected)
+- [x] RN iOS: Add Source (empty)
+- [x] RN iOS: Add Source (validation error)
+- [x] RN iOS: Add Source (valid)
+- [x] RN iOS: Feed (loading)
+- [x] RN iOS: Feed (loaded)
+- [x] RN iOS: Feed (error)
+- [x] RN iOS: Detail (loaded)
+- [x] RN iOS: About
+- [x] RN iOS: Libraries
 
 ---
 

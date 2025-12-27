@@ -43,3 +43,6 @@ yarn-error.*
 # Maestro test output (screenshots, logs, reports)
 .maestro-output/
 .maestro-screenshots/
+
+# Local-only Maestro flow (often contains a hardcoded LAN IP)
+maestro/verify-screens-local.yaml

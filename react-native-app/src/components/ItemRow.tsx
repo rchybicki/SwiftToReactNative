@@ -1,16 +1,22 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
 import { RssItem } from '../models/types';
 
 
 interface ItemRowProps {
   item: RssItem;
   onPress: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
-export function ItemRow({ item, onPress }: ItemRowProps) {
+export function ItemRow({ item, onPress, isFirst, isLast }: ItemRowProps) {
+  const containerStyle: ViewStyle[] = [styles.container];
+  if (isFirst) containerStyle.push(styles.firstItem);
+  if (isLast) containerStyle.push(styles.lastItem);
+
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity style={containerStyle} onPress={onPress}>
       <View style={styles.content}>
         <Text style={styles.title} numberOfLines={2}>
           {item.title}
@@ -33,21 +39,29 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: '#fff',
   },
+  firstItem: {
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  lastItem: {
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
   content: {
     flex: 1,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
     marginBottom: 4,
   },
   description: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    color: '#3c3c43',
   },
   chevron: {
-    fontSize: 24,
-    color: '#ccc',
+    fontSize: 18,
+    color: '#c7c7cc',
     marginLeft: 8,
   },
 });

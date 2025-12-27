@@ -9,6 +9,7 @@ interface FormFieldProps {
   type: 'string' | 'url';
   required: boolean;
   placeholder?: string;
+  testID?: string;
 }
 
 export function FormField({
@@ -18,12 +19,13 @@ export function FormField({
   type,
   required,
   placeholder,
+  testID,
 }: FormFieldProps) {
   const [isValid, setIsValid] = useState(true);
   const [isTouched, setIsTouched] = useState(false);
 
-  const validate = (text: string) => {
-    if (!isTouched) return true;
+  const validate = (text: string, touched: boolean) => {
+    if (!touched) return true;
 
     if (required && text.trim() === '') {
       return false;
@@ -36,13 +38,13 @@ export function FormField({
 
   const handleBlur = () => {
     setIsTouched(true);
-    setIsValid(validate(value));
+    setIsValid(validate(value, true));
   };
 
   const handleChangeText = (text: string) => {
     onChangeText(text);
     if (isTouched) {
-      setIsValid(validate(text));
+      setIsValid(validate(text, isTouched));
     }
   };
 
@@ -52,46 +54,41 @@ export function FormField({
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
-        style={[styles.input, !isValid && styles.inputError]}
+        style={[styles.input, !isValid && styles.inputInvalid]}
         value={value}
         onChangeText={handleChangeText}
         onBlur={handleBlur}
         placeholder={placeholder}
+        placeholderTextColor="#c7c7cc"
         keyboardType={keyboardType}
         autoCapitalize={type === 'url' ? 'none' : 'sentences'}
         autoCorrect={type !== 'url'}
+        testID={testID}
+        accessibilityLabel={label}
+        accessibilityIdentifier={testID}
       />
-      {!isValid && (
-        <Text style={styles.errorText}>
-          {required && value.trim() === '' ? 'This field is required' : 'Invalid URL'}
-        </Text>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 18,
   },
   label: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
+    fontSize: 13,
+    color: '#8e8e93',
+    marginBottom: 8,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    fontSize: 17,
+    color: '#000',
   },
-  inputError: {
-    borderColor: 'red',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginTop: 4,
+  inputInvalid: {
+    color: '#ff3b30',
   },
 });

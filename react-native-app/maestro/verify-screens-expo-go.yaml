@@ -17,6 +17,7 @@ appId: host.exp.Exponent
 - tapOn:
     text: "Open"
     optional: true
+    waitUntilVisible: true
 
 # Wait for app to load - look for Setup screen title
 - extendedWaitUntil:
@@ -27,25 +28,38 @@ appId: host.exp.Exponent
 - tapOn:
     text: "Continue"
     optional: true
+    waitUntilVisible: true
+    repeat: 3
+- tapOn:
+    id: "DevMenu"
+    optional: true
 
 # Step 1: Verify Setup Screen
+- assertVisible:
+    id: "setup-screen"
 - assertVisible: "Select source"
 - assertVisible: "Coding Journal"
 - assertVisible: "Hacker News"
-- takeScreenshot: screenshots/01-setup-default
+- assertNotVisible: "RAM"
+- takeScreenshot: .maestro-output/screenshots/01-setup-default
 
 # Step 2: Select a source by tapping on the row (stable testID)
 - tapOn:
     id: "source-row-coding-journal"
-- takeScreenshot: screenshots/02-setup-selected
+- takeScreenshot: .maestro-output/screenshots/02-setup-selected
 
 # Step 3: Navigate to Feed
 - tapOn:
     id: "next-button"
 - extendedWaitUntil:
-    visible: "Coding Journal"
+    visible:
+      id: "feed-screen"
     timeout: 15000
-- takeScreenshot: screenshots/03-feed-screen
+- extendedWaitUntil:
+    visible:
+      id: "info-button"
+    timeout: 10000
+- takeScreenshot: .maestro-output/screenshots/03-feed-screen
 
 # Step 4: Navigate to About
 - tapOn:
@@ -53,16 +67,16 @@ appId: host.exp.Exponent
 - extendedWaitUntil:
     visible: "About"
     timeout: 5000
-- assertVisible: "RSS Reader"
-- takeScreenshot: screenshots/04-about-screen
+- assertVisible: "SwiftUISampleApp"
+- takeScreenshot: .maestro-output/screenshots/04-about-screen
 
 # Step 5: Navigate to Libraries
 - tapOn:
     id: "about-item-libraries"
 - extendedWaitUntil:
-    visible: "react-native-rss-parser"
+    visible: "FeedKit"
     timeout: 5000
-- takeScreenshot: screenshots/05-libraries-screen
+- takeScreenshot: .maestro-output/screenshots/05-libraries-screen
 
 # Step 6: Go back to About
 - back
@@ -78,5 +92,4 @@ appId: host.exp.Exponent
 - extendedWaitUntil:
     visible: "Select source"
     timeout: 5000
-- takeScreenshot: screenshots/06-back-to-setup
-
+- takeScreenshot: .maestro-output/screenshots/06-back-to-setup

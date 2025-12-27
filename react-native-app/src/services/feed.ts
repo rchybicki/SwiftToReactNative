@@ -2,9 +2,12 @@ import * as rssParser from 'react-native-rss-parser';
 import { RssSource, RssItem } from '../models/types';
 
 export class FeedError extends Error {
-  constructor(message: string) {
+  recoverySuggestion?: string;
+
+  constructor(message: string, recoverySuggestion?: string) {
     super(message);
     this.name = 'FeedError';
+    this.recoverySuggestion = recoverySuggestion;
   }
 }
 
@@ -34,6 +37,21 @@ export async function fetchFeed(source: RssSource): Promise<RssItem[]> {
     if (error instanceof FeedError) {
       throw error;
     }
-    throw new Error(`Failed to fetch feed: ${(error as Error).message}`);
+
+    let filename = 'rss';
+    try {
+      const path = new URL(source.rss).pathname;
+      const parts = path.split('/').filter(Boolean);
+      if (parts.length > 0) {
+        filename = parts[parts.length - 1];
+      }
+    } catch {
+      // Keep default filename fallback.
+    }
+
+    throw new FeedError(
+      `Internal unresolved error: The file \"${filename}\" couldn't be opened.`,
+      "If you're seeing this error you probably should open an issue on github"
+    );
   }
 }

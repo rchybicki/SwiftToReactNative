@@ -38,6 +38,8 @@ public enum ScreenState<T> {
         case let .error(data: data, error: _):
             if let data {
                 self = .loaded(data: data)
+            } else {
+                self = .loading
             }
         case .loading, .loaded:
             fatalError("Invalid transition")

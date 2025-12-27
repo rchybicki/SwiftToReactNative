@@ -48,6 +48,7 @@ public struct SetupView: View {
                     } label: {
                         Image(symbol: .plus)
                     }
+                    .accessibilityIdentifier("setup-add-source")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(NSLocalizedString("Next", bundle: .module, comment: "")) {
@@ -58,6 +59,7 @@ public struct SetupView: View {
                         settings.set(selected)
                         onFinished(selected)
                     }.disabled(selected == nil)
+                        .accessibilityIdentifier("setup-next")
                 }
             }
             .sheet(isPresented: $showingAddSheet) {

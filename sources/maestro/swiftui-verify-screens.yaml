@@ -1,0 +1,122 @@
+appId: sk.kulman.SwiftUISampleApp
+---
+- launchApp:
+    clearState: true
+
+# Setup screen
+- extendedWaitUntil:
+    visible: "Select source"
+    timeout: 30000
+- takeScreenshot: setup-screen-default
+- tapOn: "Coding Journal"
+- takeScreenshot: setup-screen-selected
+
+# Open Add Source sheet (top-left +)
+- tapOn:
+    id: "setup-add-source"
+- extendedWaitUntil:
+    visible: "Add source"
+    timeout: 5000
+- takeScreenshot: add-source-empty
+
+# Validation error: enter invalid URL then blur
+- tapOn:
+    id: "add-source-url"
+- inputText: "not-a-url"
+- tapOn:
+    id: "add-source-title"
+- takeScreenshot: add-source-validation-error
+- tapOn:
+    id: "add-source-cancel"
+
+# Valid form (Add enabled) with RSS that will error
+- tapOn:
+    id: "setup-add-source"
+- extendedWaitUntil:
+    visible: "Add source"
+    timeout: 5000
+- tapOn:
+    id: "add-source-title"
+- inputText: "Example"
+- tapOn:
+    id: "add-source-url"
+- inputText: "https://example.com"
+- tapOn:
+    id: "add-source-rss"
+- inputText: "https://example.com/rss"
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      id: "add-source-image"
+    timeout: 5000
+    centerElement: true
+- takeScreenshot: add-source-valid
+
+# Add source (top-right Add)
+- tapOn:
+    id: "add-source-submit"
+
+# Back on setup list
+- extendedWaitUntil:
+    visible: "Select source"
+    timeout: 5000
+- tapOn: "Example"
+- tapOn:
+    id: "setup-next"
+- takeScreenshot: feed-screen-loading
+
+# Error alert should appear
+- extendedWaitUntil:
+    visible: "OK"
+    timeout: 10000
+- takeScreenshot: feed-screen-error
+- tapOn: "OK"
+
+# Go back to setup and select Coding Journal for normal feed
+- tapOn:
+    id: "feed-settings"
+- extendedWaitUntil:
+    visible: "Select source"
+    timeout: 5000
+- tapOn: "Coding Journal"
+- tapOn:
+    id: "setup-next"
+
+# Feed loaded
+- extendedWaitUntil:
+    visible: "Coding Journal"
+    timeout: 20000
+- takeScreenshot: feed-screen-loaded
+
+# About screen (top-right info)
+- tapOn:
+    id: "feed-about"
+- extendedWaitUntil:
+    visible: "About"
+    timeout: 5000
+- takeScreenshot: about-screen
+
+# Libraries
+- tapOn: "Used libraries"
+- extendedWaitUntil:
+    visible: "FeedKit"
+    timeout: 5000
+- takeScreenshot: libraries-screen
+- tapOn: "About"
+- extendedWaitUntil:
+    visible: "About"
+    timeout: 5000
+- tapOn: "Coding Journal"
+- extendedWaitUntil:
+    visible:
+      id: "feed-about"
+    timeout: 5000
+
+# Detail screen (tap first row)
+- tapOn:
+    point: "50%,30%"
+- extendedWaitUntil:
+    visible:
+      id: "detail-webview"
+    timeout: 5000
+- takeScreenshot: detail-screen

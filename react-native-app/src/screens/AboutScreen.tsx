@@ -9,56 +9,67 @@ import {
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { useNavigation } from '@react-navigation/native';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { AboutScreenNavigationProp } from '../navigation/types';
 import Constants from 'expo-constants';
 
 interface AboutItem {
   id: string;
   title: string;
-  subtitle?: string;
   action?: () => void;
 }
 
 export function AboutScreen() {
   const navigation = useNavigation<AboutScreenNavigationProp>();
+  const headerHeight = useHeaderHeight();
 
   const appVersion = Constants.expoConfig?.version || '1.0.0';
   const buildNumber = Constants.expoConfig?.ios?.buildNumber || '1';
+  const normalizedVersion = (() => {
+    const parts = appVersion.split('.');
+    if (parts.length === 3 && parts[2] === '0') {
+      return `${parts[0]}.${parts[1]}`;
+    }
+    return appVersion;
+  })();
+  const appName = 'RSS Reader (RN)';
 
   // Order matches SwiftUI: Used libraries first, then Author's blog
   const items: AboutItem[] = [
     {
       id: 'libraries',
-      title: 'Used Libraries',
+      title: 'Used libraries',
       action: () => navigation.navigate('Libraries'),
     },
     {
       id: 'author',
-      title: "Author's Blog",
-      subtitle: 'blog.kulman.sk',
+      title: "Author's blog",
       action: () => WebBrowser.openBrowserAsync('https://blog.kulman.sk'),
     },
   ];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      {/* Header card with logo */}
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[
+        styles.scrollContent,
+        { paddingTop: headerHeight + 8 },
+      ]}
+      contentInsetAdjustmentBehavior="never"
+    >
       <View style={styles.card}>
-        <View style={styles.header}>
+        <View style={styles.headerRow}>
           <Image
             source={require('../../assets/logo.png')}
             style={styles.icon}
             resizeMode="contain"
           />
-          <Text style={styles.appName}>RSS Reader</Text>
+          <Text style={styles.appName}>{appName}</Text>
           <Text style={styles.version}>
-            Version {appVersion} ({buildNumber})
+            {normalizedVersion} ({buildNumber})
           </Text>
         </View>
-      </View>
-
-      {/* Menu items card */}
-      <View style={styles.card}>
+        <View style={styles.separator} />
         {items.map((item, index) => (
           <React.Fragment key={item.id}>
             {index > 0 && <View style={styles.separator} />}
@@ -69,11 +80,7 @@ export function AboutScreen() {
               accessibilityLabel={item.title}
               testID={`about-item-${item.id}`}
             >
-              <View>
-                <Text style={styles.title}>{item.title}</Text>
-                {item.subtitle && <Text style={styles.subtitle}>{item.subtitle}</Text>}
-              </View>
-              {item.action && <Text style={styles.chevron}>›</Text>}
+              <Text style={styles.title}>{item.title}</Text>
             </TouchableOpacity>
           </React.Fragment>
         ))}
@@ -89,49 +96,37 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingVertical: 20,
-    gap: 20,
+    paddingBottom: 20,
   },
   card: {
     backgroundColor: '#fff',
     borderRadius: 10,
     overflow: 'hidden',
   },
-  header: {
+  headerRow: {
     alignItems: 'center',
-    padding: 24,
+    paddingVertical: 24,
+    paddingHorizontal: 16,
   },
   icon: {
-    width: 80,
-    height: 80,
-    marginBottom: 12,
+    width: 96,
+    height: 96,
+    marginBottom: 10,
   },
   appName: {
     fontSize: 20,
     fontWeight: '600',
-    marginBottom: 4,
   },
   version: {
     fontSize: 12,
     color: '#666',
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
   title: {
     fontSize: 16,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 2,
-  },
-  chevron: {
-    fontSize: 24,
-    color: '#c7c7cc',
   },
   separator: {
     height: 1,

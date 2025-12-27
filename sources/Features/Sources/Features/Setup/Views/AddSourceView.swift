@@ -27,16 +27,16 @@ struct AddSourceView: View {
     var body: some View {
         Form {
             Section(header: Text("Title", bundle: .module)) {
-                FormField(type: .string(required: true), text: $title)
+                FormField(type: .string(required: true), text: $title, accessibilityId: "add-source-title")
             }
             Section(header: Text("URL", bundle: .module)) {
-                FormField(type: .url(required: true), text: $url)
+                FormField(type: .url(required: true), text: $url, accessibilityId: "add-source-url")
             }
             Section(header: Text("RSS URL", bundle: .module)) {
-                FormField(type: .url(required: true), text: $rssUrl)
+                FormField(type: .url(required: true), text: $rssUrl, accessibilityId: "add-source-rss")
             }
             Section(header: Text("Image URL (optional)", bundle: .module)) {
-                FormField(type: .url(required: false), text: $imageUrl)
+                FormField(type: .url(required: false), text: $imageUrl, accessibilityId: "add-source-image")
             }
         }.navigationBarTitle(Text("Add source", bundle: .module))
             .toolbar {
@@ -46,6 +46,8 @@ struct AddSourceView: View {
                     } label: {
                         Image(symbol: .close)
                     }
+                    .accessibilityLabel(Text("Cancel"))
+                    .accessibilityIdentifier("add-source-cancel")
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(NSLocalizedString("Add", bundle: .module, comment: "")) {
@@ -55,7 +57,9 @@ struct AddSourceView: View {
                         }
 
                         onFinished(RssSource(title: title, url: url, rss: rssUrl, icon: imageUrl))
-                    }.disabled(!isValid)
+                    }
+                    .disabled(!isValid)
+                    .accessibilityIdentifier("add-source-submit")
                 }
             }
     }

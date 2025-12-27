@@ -19,6 +19,11 @@ if [[ ! -d "${source_dir}" ]]; then
   exit 1
 fi
 
+# Newer Maestro versions sometimes nest screenshots under an extra subfolder.
+if [[ -d "${source_dir}/screenshots" ]]; then
+  source_dir="${source_dir}/screenshots"
+fi
+
 mkdir -p "${dest_dir}"
 
 shopt -s nullglob
@@ -32,4 +37,3 @@ fi
 
 cp -f "${source_dir}"/*.png "${dest_dir}/"
 echo "Exported ${#pngs[@]} screenshot(s) -> ${dest_dir}"
-

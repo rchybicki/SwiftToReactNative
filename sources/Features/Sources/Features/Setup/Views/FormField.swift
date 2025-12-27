@@ -33,8 +33,15 @@ struct FormField: View {
     }
 
     let type: FieldType
+    let accessibilityId: String?
     @Binding var text: String
     @State var isValid = true
+
+    init(type: FieldType, text: Binding<String>, accessibilityId: String? = nil) {
+        self.type = type
+        self.accessibilityId = accessibilityId
+        self._text = text
+    }
 
     var body: some View {
         TextField("", text: $text, onEditingChanged: { isEditing in
@@ -45,6 +52,9 @@ struct FormField: View {
             }
         })
         .foregroundColor(isValid ? .primary : .red)
+        .if(accessibilityId != nil) {
+            $0.accessibilityIdentifier(accessibilityId!)
+        }
         .if(type.isURL) {
             $0.keyboardType(.URL)
                 .disableAutocorrection(true)

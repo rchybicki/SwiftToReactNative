@@ -18,8 +18,14 @@ export function useLoadableState<T>() {
 
   // Convert error state back to loaded (with cached data)
   const clearError = useCallback(() => {
-    if (state.status === 'error' && state.data) {
+    if (state.status !== 'error') {
+      return;
+    }
+
+    if (state.data) {
       setState({ status: 'loaded', data: state.data });
+    } else {
+      setState({ status: 'loading' });
     }
   }, [state]);
 

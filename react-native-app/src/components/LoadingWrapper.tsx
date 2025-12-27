@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { ScreenState } from '../models/types';
 
 interface LoadingWrapperProps<T> {
@@ -17,12 +17,7 @@ export function LoadingWrapper<T>({ state, children }: LoadingWrapperProps<T>) {
   }
 
   if (state.status === 'error' && !state.data) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.errorText}>Error loading data</Text>
-        <Text style={styles.errorDetail}>{state.error.message}</Text>
-      </View>
-    );
+    return <View style={styles.empty} />;
   }
 
   // Show data (either loaded or cached from error state)
@@ -37,15 +32,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
-  errorText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#ff3b30',
-    marginBottom: 8,
-  },
-  errorDetail: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
+  empty: {
+    flex: 1,
   },
 });

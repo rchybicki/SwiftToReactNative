@@ -53,6 +53,7 @@ public struct FeedView: View {
                 } label: {
                     Image(symbol: .gear)
                 }
+                .accessibilityIdentifier("feed-settings")
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -60,6 +61,7 @@ public struct FeedView: View {
                 } label: {
                     Image(symbol: .info)
                 }
+                .accessibilityIdentifier("feed-about")
             }
         }
     }

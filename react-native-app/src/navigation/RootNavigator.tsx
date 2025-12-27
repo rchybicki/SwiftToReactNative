@@ -20,26 +20,22 @@ interface RootNavigatorProps {
 
 export function RootNavigator({ navigationRef }: RootNavigatorProps) {
   const { selectedSource, isLoading } = useApp();
-  const hasNavigatedToFeed = useRef(false);
+  const didHandleInitialSource = useRef(false);
 
-  // Like SwiftUI Coordinator: if source exists, push Feed on top of Setup
+  // Like SwiftUI Coordinator: if a stored source exists on initial load, push Feed once.
   useEffect(() => {
-    if (!isLoading && selectedSource && !hasNavigatedToFeed.current) {
+    if (isLoading || didHandleInitialSource.current) {
+      return;
+    }
+    didHandleInitialSource.current = true;
+    if (selectedSource) {
       // Small delay to ensure navigation is ready
       const timer = setTimeout(() => {
         navigationRef.current?.navigate('Feed', { source: selectedSource });
-        hasNavigatedToFeed.current = true;
       }, 0);
       return () => clearTimeout(timer);
     }
   }, [isLoading, selectedSource, navigationRef]);
-
-  // Reset flag when source is cleared
-  useEffect(() => {
-    if (!selectedSource) {
-      hasNavigatedToFeed.current = false;
-    }
-  }, [selectedSource]);
 
   if (isLoading) {
     return (
@@ -98,7 +94,7 @@ export function RootNavigator({ navigationRef }: RootNavigatorProps) {
         name="Libraries"
         component={LibrariesScreen}
         options={{
-          title: 'Used Libraries',
+          title: 'Used libraries',
           headerLargeTitle: true,
           headerLargeTitleShadowVisible: false,
         }}

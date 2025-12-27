@@ -13,6 +13,7 @@ export function DetailScreen() {
       source={{ uri: item.link }}
       style={styles.container}
       startInLoadingState={true}
+      testID="detail-webview"
     />
   );
 }
